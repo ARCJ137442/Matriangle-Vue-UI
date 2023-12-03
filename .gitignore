@@ -1,0 +1,45 @@
+# Build and Release Folders
+bin-debug/
+bin-release/
+[Oo]bj/
+[Bb]in/
+# [Bb]uild/ # !【2023-10-28 18:00:41】现在需要存放「构建用配置脚本」如Webpack
+*.lnk
+*.zip
+*.rar
+*.7z
+*.gz
+dist/
+
+# Windows:
+[Tt]humbs.db
+[Ee]hthumbs.db
+[Dd]esktop.ini
+*.lnk
+
+# VS Code
+# .vscode # * 可能需要调试信息
+.code-workspace
+
+# Node
+node_modules/
+
+# Bash Log
+end
+*.stackdump
+git status
+
+# Test
+*pictures/
+\[test\]*
+*.test.*
+*tempCodeRunnerFile*
+
+# deprecated
+*.deprecated*
+
+# Other files and folders
+RECOVER_*
+
+# VSCode log
+debug.log
