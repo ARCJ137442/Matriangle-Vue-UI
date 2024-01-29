@@ -4,7 +4,6 @@ import { typeID } from 'matriangle-api/server/registry/IWorldRegistry'
 import { FIXED_TPS } from 'matriangle-api/server/main/GlobalWorldVariables'
 import { logical2Real } from 'matriangle-api/display/PosTransform'
 import { NativeEntityTypes } from 'matriangle-mod-native/registry/EntityRegistry_Native'
-import { IDisplayDataEntityStatePlayerV1 } from 'matriangle-mod-native/entities/player/Player_V1'
 import { BatrEntityTypes } from 'matriangle-mod-bats/registry/EntityRegistry_Batr'
 import { ZimDisplayerEntity } from '../interfaces/zim_client_entities'
 import { IDisplayDataEntityState } from 'matriangle-api/display/RemoteDisplayAPI'
@@ -18,6 +17,7 @@ import {
 	drawSingleCenteredSquareWithRotation,
 	drawPlayerTopBox,
 	drawPlayerBottomBox,
+	fillRectangleBiColored,
 } from '../zimUtils'
 import { IDisplayDataEntityStateBullet } from 'matriangle-mod-bats/entity/projectile/bullet/Bullet'
 import { formatHEX, formatHEX_A } from 'matriangle-common'
@@ -28,12 +28,16 @@ import {
 } from 'matriangle-mod-bats/registry/BonusRegistry'
 import { uint } from 'matriangle-legacy/AS3Legacy'
 import { IDisplayDataStateEffectExplode } from 'matriangle-mod-bats/entity/effect/EffectExplode'
-import { NativeDecorationLabel } from 'matriangle-mod-native/entities/player/DecorationLabels'
 import { IDisplayDataStateEffectPlayerShape } from 'matriangle-mod-bats/entity/effect/EffectPlayerShape'
 import { IDisplayDataEntityStateLaser } from 'matriangle-mod-bats/entity/projectile/laser/Laser'
 import { IDisplayDataEntityStateLaserPulse } from 'matriangle-mod-bats/entity/projectile/laser/LaserPulse'
 import { IDisplayDataStateEffectBlockLight } from 'matriangle-mod-bats/entity/effect/EffectBlockLight'
 import { IDisplayDataEntityStateThrownBlock } from 'matriangle-mod-bats/entity/projectile/other/ThrownBlock'
+import { TriangleAgentDecorationLabel } from 'matriangle-api/display/implements/triangleAgent/DecorationLabels'
+import {
+	CommonDisplayIDs,
+	IDisplayDataEntityStateTriangleAgent,
+} from 'matriangle-api/display/implements/CommonDisplayRegistry'
 
 // 抽象接口 //
 
@@ -149,6 +153,49 @@ export function commonUpdate_AVS<ESType extends IDisplayDataEntityState>(
 	return displayer
 }
 
+// 通用实体绘制 //
+// 参考：{@link src\api\display\DisplayRegistry.ts}
+
+/**
+ * 双色矩形显示数据
+ */
+const RECTANGLE_DRAW_DATAS = {
+	/** 单位正方形网格尺寸：1逻辑端格 */
+	GRID_SIZE: logical2Real(1),
+	/** 默认线型尺寸（线条粗细）：1/8（单位：逻辑端格） */
+	DEFAULT_LINE_SIZE: 1 / 8,
+}
+
+/**
+ * 通用双色矩形绘制
+ * * 重定向至绘图工具函数：{@link fillRectangleBiColored}
+ *
+ * @param graphics 绘图上下文
+ * @param width 宽度（逻辑端格）
+ * @param height 高度（逻辑端格）
+ * @param fillColor 填充颜色
+ * @param lineColor 线条颜色
+ * @param lineSize 线条粗细（逻辑端格）
+ * @returns 上下文自身
+ */
+export function drawRectangleBiColor(
+	graphics: CreateGraphics,
+	width: number,
+	height: number,
+	fillColor: uint,
+	lineColor: uint,
+	lineSize: number = RECTANGLE_DRAW_DATAS.DEFAULT_LINE_SIZE
+): CreateGraphics {
+	return fillRectangleBiColored(
+		graphics,
+		lineColor,
+		fillColor,
+		width,
+		height,
+		lineSize
+	)
+}
+
 // 玩家 //
 
 /**
@@ -168,24 +215,24 @@ export function drawPlayerDecoration(
 ): CreateGraphics {
 	// !【2023-11-23 00:35:08】正常了，但无法在填充时镂空，【2023-11-25 00:31:19】所以直接用线条颜色补上
 	switch (label) {
-		case NativeDecorationLabel.EMPTY:
+		case TriangleAgentDecorationLabel.EMPTY:
 			return graphics
-		case NativeDecorationLabel.CIRCLE:
+		case TriangleAgentDecorationLabel.CIRCLE:
 			return graphics.drawCircle(0, 0, decorationRadius)
-		case NativeDecorationLabel.SQUARE:
+		case TriangleAgentDecorationLabel.SQUARE:
 			return graphics.drawRect(
 				-decorationRadius,
 				-decorationRadius,
 				decorationRadius * 2,
 				decorationRadius * 2
 			)
-		case NativeDecorationLabel.TRIANGLE:
+		case TriangleAgentDecorationLabel.TRIANGLE:
 			return graphics
 				.moveTo(-decorationRadius, -decorationRadius)
 				.lineTo(decorationRadius, 0)
 				.lineTo(-decorationRadius, decorationRadius)
 				.lineTo(-decorationRadius, -decorationRadius)
-		case NativeDecorationLabel.DIAMOND:
+		case TriangleAgentDecorationLabel.DIAMOND:
 			return graphics
 				.moveTo(-decorationRadius, 0)
 				.lineTo(0, decorationRadius)
@@ -200,8 +247,8 @@ export function drawPlayerDecoration(
 
 /** 【2023-11-25 00:31:53】就应该有一个正式的「玩家绘制」函数 */
 export function drawPlayer(
-	displayer: ZimDisplayerEntity<IDisplayDataEntityStatePlayerV1>,
-	state: OptionalRecursive2<IDisplayDataEntityStatePlayerV1>
+	displayer: ZimDisplayerEntity<IDisplayDataEntityStateTriangleAgent>,
+	state: OptionalRecursive2<IDisplayDataEntityStateTriangleAgent>
 ): void {
 	// * 调用了，就默认需要更新了
 	const direction = state.direction ?? displayer.currentState.direction
@@ -894,12 +941,14 @@ export type EntityDrawDict = {
  *   * 而这本来最好是能被共享的
  */
 export const ENTITY_DRAW_DICT_NATIVE: EntityDrawDict = {
-	/** 目前只有「初代玩家」 */
-	[NativeEntityTypes.PLAYER.id]: {
+	/**
+	 * *【2024-01-29 22:58:03】由「初代玩家」改为「三角智能体」
+	 */
+	[CommonDisplayIDs.TRIANGLE_AGENT]: {
 		// 初始化
 		init: (
-			displayer: ZimDisplayerEntity<IDisplayDataEntityStatePlayerV1>,
-			state: IDisplayDataEntityStatePlayerV1
+			displayer: ZimDisplayerEntity<IDisplayDataEntityStateTriangleAgent>,
+			state: IDisplayDataEntityStateTriangleAgent
 		): ZimDisplayerEntity => {
 			// 绘图
 			drawPlayer(displayer, state)
@@ -912,8 +961,8 @@ export const ENTITY_DRAW_DICT_NATIVE: EntityDrawDict = {
 		},
 		// 更新
 		refresh: (
-			displayer: ZimDisplayerEntity<IDisplayDataEntityStatePlayerV1>,
-			state: OptionalRecursive2<IDisplayDataEntityStatePlayerV1>
+			displayer: ZimDisplayerEntity<IDisplayDataEntityStateTriangleAgent>,
+			state: OptionalRecursive2<IDisplayDataEntityStateTriangleAgent>
 		): ZimDisplayerEntity => {
 			// * 依据「方向/颜色 是否变化」进行更新（图形）
 			if (

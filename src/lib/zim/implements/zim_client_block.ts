@@ -56,7 +56,7 @@ export function drawWall(
 	lineSize: number = DEFAULT_SIZE / 20
 ): Shape {
 	fillSquareBiColored(
-		shape,
+		shape.graphics,
 		state.lineColor,
 		state.color,
 		DEFAULT_SIZE,
@@ -145,13 +145,12 @@ export function drawGate(
 	else {
 		// * 底座
 		fillSquareBiColored(
-			shape,
+			shape.graphics,
 			lineColor,
 			fillColor,
 			DEFAULT_SIZE,
 			lineSizeBorder
 		)
-			.graphics //
 			// * 中心
 			.beginFill(formatHEX(centerColor))
 			.drawCircle(DEFAULT_SIZE / 2, DEFAULT_SIZE / 2, DEFAULT_SIZE / 3)
@@ -174,9 +173,14 @@ export function drawLaserTrap(
 	lineSizeCenter: number = DEFAULT_SIZE / 32
 ): Shape {
 	// * 底座
-	fillSquareBiColored(shape, lineColor, fillColor, DEFAULT_SIZE, lineSize)
-	// * 图案：Rhombus | Diamond
-	shape.graphics
+	fillSquareBiColored(
+		shape.graphics,
+		lineColor,
+		fillColor,
+		DEFAULT_SIZE,
+		lineSize
+	)
+		// * 图案：Rhombus | Diamond
 		.beginStroke(formatHEX(centerColor)) // ! 替代Flash中的`graphics.lineStyle`
 		.setStrokeStyle(lineSizeCenter)
 	drawDiamond(
@@ -214,9 +218,14 @@ export function drawColorSpawner(
 	lineSizeCenter: number = DEFAULT_SIZE / 32
 ): Shape {
 	// * 底座
-	fillSquareBiColored(shape, lineColor, fillColor, DEFAULT_SIZE, lineSize)
-	// * 图案
-	shape.graphics
+	fillSquareBiColored(
+		shape.graphics,
+		lineColor,
+		fillColor,
+		DEFAULT_SIZE,
+		lineSize
+	)
+		// * 图案
 		.setStrokeStyle(lineSizeCenter) // ! 替代Flash中的`graphics.lineStyle`
 		.beginStroke(formatHEX(centerColor))
 		.drawCircle(DEFAULT_SIZE / 2, DEFAULT_SIZE / 2, DEFAULT_SIZE * 0.25)

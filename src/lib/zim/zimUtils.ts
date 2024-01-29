@@ -58,28 +58,29 @@ export function graphicsLineStyle<T>(
  * 矩形框E
  */
 export function fillRectangleBiColored(
-	shape: Shape,
+	graphics: CreateGraphics,
 	lineColor: uint,
 	fillColor: uint,
 	width: number,
 	height: number,
 	lineSize: number
-): Shape {
-	shape.graphics
-		// Line
-		.beginFill(formatHEX(lineColor))
-		.drawRect(0, 0, width, height)
-		.endFill()
-		// Fill
-		.beginFill(formatHEX(fillColor))
-		.drawRect(
-			lineSize,
-			lineSize,
-			width - lineSize * 2,
-			height - lineSize * 2
-		)
-		.endFill()
-	return shape
+): CreateGraphics {
+	return (
+		graphics
+			// Line
+			.beginFill(formatHEX(lineColor))
+			.drawRect(0, 0, width, height)
+			.endFill()
+			// Fill
+			.beginFill(formatHEX(fillColor))
+			.drawRect(
+				lineSize,
+				lineSize,
+				width - lineSize * 2,
+				height - lineSize * 2
+			)
+			.endFill()
+	)
 }
 
 /**
@@ -90,14 +91,21 @@ export function fillRectangleBiColored(
  * 正方形框
  */
 export function fillSquareBiColored(
-	shape: Shape,
+	graphics: CreateGraphics,
 	lineColor: uint,
 	fillColor: uint,
-	a: number,
+	size: number,
 	lineSize: number
-): Shape {
+): CreateGraphics {
 	// 重定向至矩形框：长宽相等
-	return fillRectangleBiColored(shape, lineColor, fillColor, a, a, lineSize)
+	return fillRectangleBiColored(
+		graphics,
+		lineColor,
+		fillColor,
+		size,
+		size,
+		lineSize
+	)
 }
 
 /**
