@@ -17,7 +17,8 @@
 		"skipLibCheck": true,
 		/* Bundler mode */
 		"moduleResolution": "Bundler", // *【2023-10-28 16:52:57】没事，不会影响开发
-		"allowImportingTsExtensions": true,
+		// "moduleResolution": "node", // !【2024-01-29 16:29:15】✅已解决：跨电脑全线飙红，但发现是VSCode版本问题
+		// "allowImportingTsExtensions": true,
 		"isolatedModules": true,
 		"noEmit": true,
 		"jsx": "preserve",
