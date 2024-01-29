@@ -55,6 +55,38 @@ export function graphicsLineStyle<T>(
  * * 以原点为起始点的
  * * 全不透明的
  * * 里外两种颜色嵌套的
+ * 矩形框E
+ */
+export function fillRectangleBiColored(
+	shape: Shape,
+	lineColor: uint,
+	fillColor: uint,
+	width: number,
+	height: number,
+	lineSize: number
+): Shape {
+	shape.graphics
+		// Line
+		.beginFill(formatHEX(lineColor))
+		.drawRect(0, 0, width, height)
+		.endFill()
+		// Fill
+		.beginFill(formatHEX(fillColor))
+		.drawRect(
+			lineSize,
+			lineSize,
+			width - lineSize * 2,
+			height - lineSize * 2
+		)
+		.endFill()
+	return shape
+}
+
+/**
+ * 填充
+ * * 以原点为起始点的
+ * * 全不透明的
+ * * 里外两种颜色嵌套的
  * 正方形框
  */
 export function fillSquareBiColored(
@@ -64,16 +96,8 @@ export function fillSquareBiColored(
 	a: number,
 	lineSize: number
 ): Shape {
-	shape.graphics
-		// Line
-		.beginFill(formatHEX(lineColor))
-		.drawRect(0, 0, a, a)
-		.endFill()
-		// Fill
-		.beginFill(formatHEX(fillColor))
-		.drawRect(lineSize, lineSize, a - lineSize * 2, a - lineSize * 2)
-		.endFill()
-	return shape
+	// 重定向至矩形框：长宽相等
+	return fillRectangleBiColored(shape, lineColor, fillColor, a, a, lineSize)
 }
 
 /**
@@ -142,7 +166,7 @@ export function drawSquareFrameCenter(
 }
 
 /**
- * 绘制一个中心在原点、边长为r、倾角为rot的正n边形
+ * 绘制一个中心在原点、边长为r、倾角为rot_arc的正n边形
  * * 初始点即`(r cos rot, r sin rot)`
  *
  * ! 只包含绘制函数
@@ -269,8 +293,8 @@ export function drawPlayerTriangleGradient<G extends CreateGraphics>(
 			realRadiusX,
 			0
 			/* m,
-		SpreadMethod.PAD,
-		InterpolationMethod.RGB */
+			  SpreadMethod.PAD,
+			  InterpolationMethod.RGB */
 		)
 	// 绘制图形
 	drawCallback(graphics, size, lineSize, realRadiusX, realRadiusY)
@@ -336,7 +360,6 @@ export function drawPlayerBottomBox(
  * * 参考自旧AS3代码 @ `BattleTriangle-Gamma\batr\game\entity\entities\BonusBox.as`
  *
  * @param graphics 要绘制的图形
- * @param blockSize 作为参照的「方块」大小
  * @param boxSize 盒子大小
  * @param boxLineSize 盒子外边界线粗细
  * @param boxRoundSize 盒子圆角尺寸
