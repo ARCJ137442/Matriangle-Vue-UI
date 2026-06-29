@@ -16,8 +16,6 @@ export default merge(baseConfig, {
 		compress: false, // gzip压缩,开发环境不开启,提升热更新速度
 		hot: true, // 开启热更新，后面会讲vue3模块热替换具体配置
 		historyApiFallback: true, // 解决history路由404问题
-		static: {
-			directory: path.join(__dirname, "../public"), //托管静态资源public文件夹
-		}
+		static: path.join(__dirname, "../public"), // 托管静态资源public文件夹（webpack-dev-server 5.x 写法：直接传路径字符串）
 	}
 })
