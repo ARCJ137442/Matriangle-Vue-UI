@@ -19,12 +19,35 @@
 
 ## 🤖 Agent 维护披露
 
-> 本仓库自 2026-06-29 起的维护性 commit（包括本次依赖升级、Dependabot 告警处理、文档同步）均由 AI Agent **MiniMax-M3** 在用户监督下协助完成。
->
-> - **Agent 角色**：执行批量依赖升级、npm audit 验证、配置文件迁移（webpack-dev-server 4→5）、lock 文件重生成
-> - **人工监督**：所有 commit 由用户审阅后手动 push
-> - **披露原则**：遵循「Agent 协作必须可追溯」原则，commit 信息、文档修改、依赖变更均可被审计
-> - **能力边界**：本项目不再接受新功能开发，仅做安全维护；如发现新漏洞请自行处理
+> ⚠️ **重要边界说明：以下披露仅适用于「部分最新提交」，不代表项目历史代码由 Agent 编写。**
+
+**历史代码归属**：本仓库 2023-12 至 2024 年的全部历史 commit（包含绝大部分源码、文档、配置）均由项目作者 `ARCJ137442` **人工编写**，AI Agent **未参与**。这些历史 commit 不含 `Co-Authored-By: MiniMax-M3` 标记。
+
+**Agent 维护范围**（**仅限以下 4 个 commit**，2026-06-29）：
+
+| Commit 主题 | 改动内容 | 协作 Agent |
+|------------|----------|-----------|
+| `docs: 精确化 Agent 维护披露边界` | README 修正披露边界（明确「仅部分最新提交」）| MiniMax-M3 |
+| `docs: 标注项目停止维护状态 + Agent 维护披露` | README 顶部加维护状态 + Agent 披露区块 | MiniMax-M3 |
+| `fix(deps): bump postcss to 8.5.16` | postcss 8.5.10 → 8.5.16（满足 @vue/compiler-sfc 8.5.15 要求）| MiniMax-M3 |
+| `chore(deps): upgrade webpack-dev-server to 5.2.5` | 升级 webpack-dev-server 4→5.2.5、html-webpack-plugin 5.6.7、加 overrides 锁 11 个传递依赖 | MiniMax-M3 |
+
+> 📋 完整 commit 列表请见 [commits 页面](https://github.com/ARCJ137442/Matriangle-Vue-UI/commits/main)（按时间倒序查看 2026-06-29 的所有 commit）
+
+**Agent 在上述 3 个 commit 中的具体工作**：
+- 执行 `npm install` 重新生成 lock 文件
+- 验证 `npm audit` 与 `npm run build-n` 通过
+- 适配 `webpack-dev-server` 4→5 大版本升级的配置语法
+- 撰写本次 README 披露区块
+- 决定取消仓库 watch 订阅（`PUT /subscription ignored=true`）
+
+**未由 Agent 完成的工作**：
+- 业务逻辑代码（Vue 组件、TypeScript 模块、Webpack 配置）
+- 项目架构设计
+- 依赖选型决策
+- 测试用例
+
+**披露原则**：所有 Agent 协助的 commit 在 git 历史中可审计；如需查看具体改动，对照上述 commit hash 即可定位。
 
 ## Overview 概述
 
